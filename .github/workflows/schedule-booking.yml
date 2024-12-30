@@ -1,0 +1,38 @@
+name: Schedule Soul Cycle Booking
+
+on:
+  schedule:
+    # Run every day at 10am UTC
+    - cron: '0 10 * * *'
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  book-class:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, xml
+
+    - name: Install Chrome
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y chromium-browser
+
+    - name: Install Composer Dependencies
+      run: composer install --no-interaction --prefer-dist
+
+    - name: Setup Environment
+      run: |
+        echo "SOULCYCLE_EMAIL=${{ secrets.SOULCYCLE_EMAIL }}" >> .env
+        echo "SOULCYCLE_PASSWORD=${{ secrets.SOULCYCLE_PASSWORD }}" >> .env
+        echo "DESIRED_CLASS_TIME=${{ secrets.DESIRED_CLASS_TIME }}" >> .env
+        echo "DESIRED_LOCATION=${{ secrets.DESIRED_LOCATION }}" >> .env
+
+    - name: Run Booking Command
+      run: php application soulcycle:book
