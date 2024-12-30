@@ -1,5 +1,10 @@
 <?php
 
 use LaravelZero\Framework\Application;
+use Dotenv\Dotenv;
 
-return Application::configure(basePath: dirname(__DIR__))->create();
+$app = Application::configure(basePath: dirname(__DIR__))->create();
+
+Dotenv::createImmutable(dirname(__DIR__))->safeLoad();
+
+return $app;
